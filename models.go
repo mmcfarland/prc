@@ -20,7 +20,7 @@ type Parcel struct {
 }
 
 type Scanner interface {
-	Scan(...interface{}) error
+	Scan(dest ...interface{}) error
 }
 
 func ScanParcelRow(s Scanner) (*Parcel, error) {
@@ -56,7 +56,8 @@ func ParcelsById(ids []int) (*[]Parcel, error) {
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return nil, err
 	} else {
-		return ScanParcelRows(&s.Query(ids))
+		rs, err := s.Query(ids)
+		return ScanParcelRows(rs)
 	}
 }
 
