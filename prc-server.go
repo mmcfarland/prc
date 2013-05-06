@@ -3,16 +3,18 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	_ "github.com/bmizerany/pq"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"runtime"
 	"strconv"
-	//"text/template"
 )
 
 var (
-	port = flag.Int("port", 7878, "Port")
+	port   = flag.Int("port", 7878, "Port")
+	DbConn = setupDb()
 )
 
 const (
@@ -34,17 +36,23 @@ func dbHandler(fn func(w http.ResponseWriter, r *http.Request, db *sql.DB), db *
 }
 
 func setupHandlers() {
-	//http.Handle("/",  indexHandler)
+	r := mux.NewRouter()
+	api := r.PathPrefix("/api").Subrouter()
+	api.HandleFunc("/parcels/{id:[0-9]+}", ParcelDetailsHandler)
+
+	http.Handle("/", r)
 }
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	db := setupDb()
-	defer db.Close()
+	flag.Parse()
+	//db := setupDb()
+	defer DbConn.Close()
 
+	setupHandlers()
 	if err := http.ListenAndServe(":"+strconv.Itoa(*port), nil); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		fmt.Println("Failed to start server: %v", err)
 	} else {
-		log.Println("Listening on port: " + strconv.Itoa(*port))
+		fmt.Println("Listening on port: " + strconv.Itoa(*port))
 	}
 }
