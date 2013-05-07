@@ -30,3 +30,15 @@ func ParcelDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(b)
 	}
 }
+
+func CollectionDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	cid, _ := strconv.Atoi(vars["cid"])
+	log.Printf("Get collection: %d", cid)
+	if ps, err := ParcelsByCid(cid); err != nil {
+		ResponseWithError(cid, err, w, "Collection")
+	} else {
+		b, _ := json.Marshal(ps)
+		w.Write(b)
+	}
+}

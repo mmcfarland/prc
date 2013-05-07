@@ -39,7 +39,7 @@ func setupHandlers() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 	api.HandleFunc("/parcels/{id:[0-9]+}", ParcelDetailsHandler)
-
+	api.HandleFunc("/collections/{cid:[0-9]+}", CollectionDetailsHandler)
 	http.Handle("/", r)
 }
 
