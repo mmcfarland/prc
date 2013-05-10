@@ -11,8 +11,8 @@ import (
 
 func ResponseWithError(id int, err error, w http.ResponseWriter, name string) {
 	if err == sql.ErrNoRows {
-		http.Error(w, "Parcel Not Found", 404)
-		log.Printf("Could not find parcel: %d", id)
+		http.Error(w, name+" Not Found", 404)
+		log.Printf("Could not find %s : %d", name, id)
 	} else {
 		log.Println(err)
 		http.Error(w, "", 500)
