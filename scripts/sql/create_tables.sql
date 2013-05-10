@@ -1,6 +1,6 @@
 create table if not exists collections (
 	id 		serial PRIMARY KEY,
-	tile 		varchar(255) NOT NULL,
+	title 		varchar(255) NOT NULL,
 	description	text,
 	owner 		varchar(55),
 	public 		boolean,
