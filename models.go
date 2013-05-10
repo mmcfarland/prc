@@ -29,7 +29,7 @@ func ScanParcelRow(s Scanner) (*Parcel, error) {
 	return &p, err
 }
 
-func ScanParcelRows(rs sql.Rows) (*[]Parcel, error) {
+func ScanParcelRows(rs sql.Rows) ([]Parcel, error) {
 	var parcels []Parcel
 	for rs.Next() {
 		p, err := ScanParcelRow(&rs)
@@ -39,7 +39,7 @@ func ScanParcelRows(rs sql.Rows) (*[]Parcel, error) {
 			parcels = append(parcels, *p)
 		}
 	}
-	return &parcels, nil
+	return parcels, nil
 }
 
 func ParcelById(id int) (*Parcel, error) {
@@ -51,7 +51,7 @@ func ParcelById(id int) (*Parcel, error) {
 	}
 }
 
-func ParcelsByCid(cid int) (*[]Parcel, error) {
+func ParcelsByCid(cid int) ([]Parcel, error) {
 	sql := "SELECT p.parcelid, p.address, p.owner1, p.owner2, p.bldg_code, p.bldg_desc, p.brt_id, ST_AsGeoJSON(p.geom) FROM pwd_parcels p, collection_parcels c where p.parcelid = c.parcelid and c.collectionid = $1;"
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return nil, err
@@ -64,14 +64,34 @@ func ParcelsByCid(cid int) (*[]Parcel, error) {
 	}
 }
 
+func CollectionById(id int) (*Collection, error) {
+	sql := `SELECT id, title, description, owner, public, created, modified 
+            FROM Collections 
+            WHERE id = $1;`
+	if s, err := DbConn.Prepare(sql); err != nil {
+		return nil, err
+	} else {
+		r := s.QueryRow(id)
+		var c Collection
+		go r.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created,
+			&c.Modified)
+		if c.Parcels, err = ParcelsByCid(id); err != nil {
+			return &c, err
+		} else {
+			return &c, nil
+		}
+	}
+}
+
 type Collection struct {
-	Id       int
-	Title    string
-	Desc     string
-	Parcels  []Parcel
-	Owner    int
-	IsPublic bool
-	Created  time.Time
+	Id       int       `json:"id"`
+	Title    string    `json:"title"`
+	Desc     string    `json:"desc"`
+	Parcels  []Parcel  `json:"parcels"`
+	Owner    int       `json:"owner"`
+	Public   bool      `json:"public"`
+	Created  time.Time `json:"created"`
+	Modified time.Time `json:"modified"`
 }
 
 type User struct {

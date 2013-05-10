@@ -35,10 +35,10 @@ func CollectionDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	cid, _ := strconv.Atoi(vars["cid"])
 	log.Printf("Get collection: %d", cid)
-	if ps, err := ParcelsByCid(cid); err != nil {
+	if c, err := CollectionById(cid); err != nil {
 		ResponseWithError(cid, err, w, "Collection")
 	} else {
-		b, _ := json.Marshal(ps)
+		b, _ := json.Marshal(c)
 		w.Write(b)
 	}
 }
