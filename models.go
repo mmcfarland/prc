@@ -43,7 +43,10 @@ func ScanParcelRows(rs sql.Rows) ([]Parcel, error) {
 }
 
 func ParcelById(id int) (*Parcel, error) {
-	sql := "SELECT parcelid, address, owner1, owner2, bldg_code, bldg_desc, brt_id, ST_AsGeoJSON(geom) FROM pwd_parcels where parcelid = $1;"
+	sql := `SELECT parcelid, address, owner1, owner2, bldg_code, bldg_desc, brt_id,
+                ST_AsGeoJSON(geom)
+            FROM pwd_parcels
+            WHERE parcelid = $1;`
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return nil, err
 	} else {
@@ -52,7 +55,10 @@ func ParcelById(id int) (*Parcel, error) {
 }
 
 func ParcelsByCid(cid int) ([]Parcel, error) {
-	sql := "SELECT p.parcelid, p.address, p.owner1, p.owner2, p.bldg_code, p.bldg_desc, p.brt_id, ST_AsGeoJSON(p.geom) FROM pwd_parcels p, collection_parcels c where p.parcelid = c.parcelid and c.collectionid = $1;"
+	sql := `SELECT p.parcelid, p.address, p.owner1, p.owner2, p.bldg_code, 
+                p.bldg_desc, p.brt_id, ST_AsGeoJSON(p.geom)
+            FROM pwd_parcels p, collection_parcels c
+            WHERE p.parcelid = c.parcelid and c.collectionid = $1;`
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return nil, err
 	} else {
@@ -73,8 +79,10 @@ func CollectionById(id int) (*Collection, error) {
 	} else {
 		r := s.QueryRow(id)
 		var c Collection
-		go r.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created,
-			&c.Modified)
+		if err := r.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created,
+			&c.Modified); err != nil {
+			return nil, err
+		}
 		if c.Parcels, err = ParcelsByCid(id); err != nil {
 			return &c, err
 		} else {
@@ -84,18 +92,18 @@ func CollectionById(id int) (*Collection, error) {
 }
 
 type Collection struct {
-	Id       int       `json:"id"`
-	Title    string    `json:"title"`
-	Desc     string    `json:"desc"`
-	Parcels  []Parcel  `json:"parcels"`
-	Owner    int       `json:"owner"`
-	Public   bool      `json:"public"`
-	Created  time.Time `json:"created"`
-	Modified time.Time `json:"modified"`
+	Id       int        `json:"id"`
+	Title    string     `json:"title"`
+	Desc     string     `json:"desc"`
+	Parcels  []Parcel   `json:"parcels"`
+	Owner    string     `json:"owner"`
+	Public   bool       `json:"public"`
+	Created  *time.Time `json:"created"`
+	Modified *time.Time `json:"modified"`
 }
 
 type User struct {
-	Id    int
-	Name  string
-	email string
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	email string `json:"email"`
 }
