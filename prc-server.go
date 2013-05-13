@@ -10,11 +10,13 @@ import (
 	"net/http"
 	"runtime"
 	"strconv"
+	"text/template"
 )
 
 var (
-	port   = flag.Int("port", 7878, "Port")
-	DbConn = setupDb()
+	port      = flag.Int("port", 7878, "Port")
+	DbConn    = setupDb()
+	indexTmpl = template.Must(template.ParseFiles("templates/index.html"))
 )
 
 const (
@@ -29,6 +31,10 @@ func setupDb() (db *sql.DB) {
 	return
 }
 
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	indexTmpl.Execute(w, r.Host)
+}
+
 func dbHandler(fn func(w http.ResponseWriter, r *http.Request, db *sql.DB), db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fn(w, r, db)
@@ -37,16 +43,17 @@ func dbHandler(fn func(w http.ResponseWriter, r *http.Request, db *sql.DB), db *
 
 func setupHandlers() {
 	r := mux.NewRouter()
-	api := r.PathPrefix("/api").Subrouter()
+	api := r.PathPrefix("/api/v0.1").Subrouter()
 	api.HandleFunc("/parcels/{id:[0-9]+}", ParcelDetailsHandler)
 	api.HandleFunc("/collections/{cid:[0-9]+}", CollectionDetailsHandler)
+	r.HandleFunc("/", indexHandler)
+	http.Handle("/client/", http.StripPrefix("/client/", http.FileServer(http.Dir("client"))))
 	http.Handle("/", r)
 }
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	flag.Parse()
-	//db := setupDb()
 	defer DbConn.Close()
 
 	setupHandlers()
