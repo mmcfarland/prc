@@ -46,7 +46,7 @@ func setupHandlers() {
 	api := r.PathPrefix("/api/v0.1").Subrouter()
 	api.HandleFunc("/parcels/{id:[0-9]+}", ParcelDetailsHandler)
 	api.HandleFunc("/collections/{cid:[0-9]+}", CollectionDetailsHandler)
-	api.HandleFunc("/parcels/", ParcelLocationHandler)
+	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
 
 	r.HandleFunc("/", indexHandler)
 	http.Handle("/client/", http.StripPrefix("/client/", http.FileServer(http.Dir("client"))))
