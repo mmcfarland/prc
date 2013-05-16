@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/bmizerany/pq"
 	"time"
 )
@@ -67,6 +68,19 @@ func ParcelsByCid(cid int) ([]Parcel, error) {
 		} else {
 			return ScanParcelRows(*rs)
 		}
+	}
+}
+
+func ParcelByLocation(lat, lon float64) (*Parcel, error) {
+	pointWkt := fmt.Sprintf("POINT (%f %f)", lon, lat)
+	sql := `SELECT parcelid, address, owner1, owner2, bldg_code, bldg_desc,
+                brt_id, ST_AsGeoJSON(geom)
+            FROM pwd_parcels
+            WHERE ST_Intersects(ST_GeomFromText($1, 4326), geom) = true;`
+	if s, err := DbConn.Prepare(sql); err != nil {
+		return nil, err
+	} else {
+		return ScanParcelRow(s.QueryRow(pointWkt))
 	}
 }
 

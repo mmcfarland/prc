@@ -42,3 +42,24 @@ func CollectionDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(b)
 	}
 }
+func ParcelLocationHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println(r)
+	lat, err := strconv.ParseFloat(r.FormValue("lat"), 32)
+	if err != nil {
+		http.Error(w, "Bad latitude value", 500)
+		return
+	}
+	lon, err := strconv.ParseFloat(r.FormValue("lon"), 32)
+	if err != nil {
+		http.Error(w, "Bad longitude value", 500)
+		return
+	}
+	log.Printf("Search for: %d,%d", lat, lon)
+
+	if p, err := ParcelByLocation(lat, lon); err != nil {
+		ResponseWithError(0, err, w, "Parcel")
+	} else {
+		b, _ := json.Marshal(p)
+		w.Write(b)
+	}
+}
