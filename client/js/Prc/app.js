@@ -7,8 +7,7 @@
         data: {},
 
         init: function () {
-            N.TemplateLoader().load(N.app.tmpl);
-            var m = new N.Map();
+            new N.TemplateLoader().load(N.app.tmpl);
         }
     };
 }(Prc));
