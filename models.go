@@ -17,7 +17,7 @@ type Parcel struct {
 	BuildingDesc *string
 	OpaId        *string
 	GeomWkt      *string
-	Pop          *string
+	Pos          *string
 }
 
 type Scanner interface {
@@ -26,7 +26,7 @@ type Scanner interface {
 
 func ScanParcelRow(s Scanner) (*Parcel, error) {
 	var p Parcel
-	err := s.Scan(&p.ParcelId, &p.Address, &p.Owner1, &p.Owner2, &p.BuildingCode, &p.BuildingDesc, &p.OpaId, &p.GeomWkt)
+	err := s.Scan(&p.ParcelId, &p.Address, &p.Owner1, &p.Owner2, &p.BuildingCode, &p.BuildingDesc, &p.OpaId, &p.GeomWkt, &p.Pos)
 	return &p, err
 }
 
@@ -45,7 +45,7 @@ func ScanParcelRows(rs sql.Rows) ([]Parcel, error) {
 
 func ParcelById(id int) (*Parcel, error) {
 	sql := `SELECT parcelid, address, owner1, owner2, bldg_code, bldg_desc, brt_id,
-                ST_AsGeoJSON(geom)
+                ST_AsGeoJSON(geom), ST_AsGeoJSON(pos)
             FROM pwd_parcels
             WHERE parcelid = $1;`
 	if s, err := DbConn.Prepare(sql); err != nil {
@@ -57,7 +57,7 @@ func ParcelById(id int) (*Parcel, error) {
 
 func ParcelsByCid(cid int) ([]Parcel, error) {
 	sql := `SELECT p.parcelid, p.address, p.owner1, p.owner2, p.bldg_code, 
-                p.bldg_desc, p.brt_id, ST_AsGeoJSON(p.geom)
+                p.bldg_desc, p.brt_id, ST_AsGeoJSON(p.geom), ST_AsGeoJSON(p.pos)
             FROM pwd_parcels p, collection_parcels c
             WHERE p.parcelid = c.parcelid and c.collectionid = $1;`
 	if s, err := DbConn.Prepare(sql); err != nil {
@@ -74,7 +74,7 @@ func ParcelsByCid(cid int) ([]Parcel, error) {
 func ParcelByLocation(lat, lon float64) (*Parcel, error) {
 	pointWkt := fmt.Sprintf("POINT (%f %f)", lon, lat)
 	sql := `SELECT parcelid, address, owner1, owner2, bldg_code, bldg_desc,
-                brt_id, ST_AsGeoJSON(geom)
+                brt_id, ST_AsGeoJSON(geom), ST_AsGeoJSON(pos)
             FROM pwd_parcels
             WHERE ST_Intersects(ST_GeomFromText($1, 4326), geom) = true;`
 	if s, err := DbConn.Prepare(sql); err != nil {
