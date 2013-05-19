@@ -58,7 +58,7 @@ func ParcelLocationHandler(w http.ResponseWriter, r *http.Request) {
 	if p, err := ParcelByLocation(lat, lon); err != nil {
 		ResponseWithError(0, err, w, "Parcel")
 	} else {
-		b, _ := json.Marshal(p)
+		b, _ := json.Marshal([]Parcel{*p})
 		w.Write(b)
 	}
 }

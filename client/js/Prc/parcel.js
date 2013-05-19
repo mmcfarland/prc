@@ -5,7 +5,7 @@
 
     N.collections.Parcels = Backbone.Collection.extend({
         model: N.models.Parcel,
-        urlRoot: '/api/v0.1/parcels'
+        url: '/api/v0.1/parcels/'
     });
 
 }(Prc));
