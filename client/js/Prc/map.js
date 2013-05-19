@@ -22,8 +22,13 @@
         _.extend(self, Backbone.Events)
     };
     N.Map.prototype.popup = function(parcel) {
-        return L.popup().setLatLng($.parseJSON(parcel.get('Pos')).coordinates.reverse())
-                .setContent(parcel.get('Owner1')).openOn(this.map);
+        return L.popup().setLatLng(parcel.getCoordinates())
+                .setContent(parcel.get('Owner1'))
+                .openOn(this.map);
+    };
+
+    N.Map.prototype.addGeom = function(geom) {
+        L.geoJson(geom).addTo(this.map);
     };
 
     N.models.Map = Backbone.Model.extend({
@@ -47,14 +52,22 @@
                 self.makeParcelInfoRequest(e.latlon);
             });
             self.model.get('selectedParcels').on('reset', function() {
-                self.popup = self.map.popup(this.at(0));
-                
+                // `this` is the selectedParcels collection
+                self._handleSelectedParcels(this);    
             });
         },
 
         makeParcelInfoRequest: function(latlon) {
             this.model.get('selectedParcels').fetch({data: latlon});
+        }, 
+
+        _handleSelectedParcels: function(parcels) {
+            var parcel = parcels.at(0);
+            this.popup = this.map.popup(parcel);
+            this.map.addGeom(parcel.getGeom());
         }
+
+            
     });
 
 

@@ -16,7 +16,7 @@ type Parcel struct {
 	BuildingCode *string
 	BuildingDesc *string
 	OpaId        *string
-	GeomWkt      *string
+	Geom         *string
 	Pos          *string
 }
 
@@ -26,7 +26,7 @@ type Scanner interface {
 
 func ScanParcelRow(s Scanner) (*Parcel, error) {
 	var p Parcel
-	err := s.Scan(&p.ParcelId, &p.Address, &p.Owner1, &p.Owner2, &p.BuildingCode, &p.BuildingDesc, &p.OpaId, &p.GeomWkt, &p.Pos)
+	err := s.Scan(&p.ParcelId, &p.Address, &p.Owner1, &p.Owner2, &p.BuildingCode, &p.BuildingDesc, &p.OpaId, &p.Geom, &p.Pos)
 	return &p, err
 }
 
