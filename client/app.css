@@ -4,7 +4,40 @@ html, body {
     overflow: hidden;
 }
 
+header.main {
+    display: block;
+    width: 100%;
+    background: rgb(155,155,155);
+    height: 75px;
+    z-index: 1;
+    position: absolute;
+}
+
+    header.main .logo {
+    }
+
+    header.main .search-bar {
+        margin: 0 auto;
+        width: 50%;
+        padding: 5px;
+    }
+
+        header.main .search-bar input {
+            border-radius: 4px;
+            padding: 10px;
+        }
+    
+#map-outer {
+    margin-top: 75px;
+}
+
 #map {
     width:100%;
     height: 100%;
+}
+
+
+/* LEAFLET OVERRIDES */
+.leaflet-popup .leaflet-popup-content-wrapper {
+    border-radius: 5px;
 }
