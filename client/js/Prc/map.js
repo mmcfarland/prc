@@ -9,9 +9,13 @@
 
         self.map = new L.map(options.el, {
             center: [39.95, -75.15],
-            zoom: 12
+            zoom: 15
         });
-       
+      
+        // Highlight selected parcels layer
+        self.selectedLayer = L.layerGroup().addTo(self.map); 
+//      self.map.fitBounds([20,30]);
+
         self.map.on("click", function(e) {
             self.trigger("click", {latlon: {
                 lat: e.latlng.lat, lon: e.latlng.lng
@@ -22,13 +26,15 @@
         _.extend(self, Backbone.Events)
     };
     N.Map.prototype.popup = function(parcel) {
+        var context = {parcel: parcel.toJSON()},
+            content = N.app.tmpl["template-parcel-detail"](context);
         return L.popup().setLatLng(parcel.getCoordinates())
-                .setContent(parcel.get('Owner1'))
+                .setContent(content)
                 .openOn(this.map);
     };
 
-    N.Map.prototype.addGeom = function(geom) {
-        L.geoJson(geom).addTo(this.map);
+    N.Map.prototype.selectSingleGeom = function(geom) {
+        L.geoJson(geom).addTo(this.selectedLayer.clearLayers());
     };
 
     N.models.Map = Backbone.Model.extend({
@@ -64,7 +70,7 @@
         _handleSelectedParcels: function(parcels) {
             var parcel = parcels.at(0);
             this.popup = this.map.popup(parcel);
-            this.map.addGeom(parcel.getGeom());
+            this.map.selectSingleGeom(parcel.getGeom());
         }
 
             
