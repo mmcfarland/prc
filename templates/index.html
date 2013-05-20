@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>prc</title>
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/foundation/4.1.2/css/foundation.min.css"/>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css" />
         <link rel="stylesheet" href="client/app.css"/>
         <!--[if lte IE 8]>
@@ -10,7 +11,29 @@
 
     </head>
     <body>
+        <header class="main">
+            <div class="logo">prc</div>
+            <div class="search-bar">
+                <input id="search" type="search" autofocus/>
+            </div>
+        </header>
         <div id="map"> </div>
+        
+        <script type="text/template" id="template-parcel-detail">
+            <h4><%=parcel.Address%></h4>
+            <h5><% print(parcel.Owner1 + " " + parcel.Owner2);%></h5>
+            <ul class="pd-parcel">
+                <li><div class="cap">OPA Account</div>
+                    <div class="val"><%=parcel.OpaId%></div>            
+                </li>
+                <li><div class="cap">Building Code</div>
+                    <div class="val"><%=parcel.BuildingCode%></div>            
+                </li>
+                <li><div class="cap">Building Desc</div>
+                    <div class="val"><%=parcel.BuildingDesc%></div>            
+                </li>
+        </script>
+
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/4.1.2/js/foundation.min.js"></script>
         <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script> 
