@@ -41,25 +41,26 @@
         defaults: {
             selectedParcels: new N.collections.Parcels(),
             highlightParcel: null
-        }, 
-
-        initialize: function() {
-            var self = this;
-            
-        }
+        }, initialize: function() { var self = this; }
     });
 
+    /* VIEW */
     N.views.Map = Backbone.View.extend({
 
         initialize: function() {
             var self = this;
-            self.map = new N.Map();
-            self.map.on('click', function(e) {
+            self._map = new N.Map();
+            self._map.on('click', function(e) {
                 self.makeParcelInfoRequest(e.latlon);
             });
+
             self.model.get('selectedParcels').on('reset', function() {
                 // `this` is the selectedParcels collection
                 self._handleSelectedParcels(this);    
+            });
+
+            self.options.search.on('change:searchParcel', function(s, pi) {
+                self.showParcel(pi);
             });
         },
 
@@ -67,10 +68,19 @@
             this.model.get('selectedParcels').fetch({data: latlon});
         }, 
 
+        showParcel: function(parcelInfo) {
+            var p = new N.models.Parcel({id: parcelInfo.parcelId}),
+                view = this;
+
+            p.fetch().done(function(d) {
+                view.model.get('selectedParcels').reset([p]);
+             });
+        },
+
         _handleSelectedParcels: function(parcels) {
             var parcel = parcels.at(0);
-            this.popup = this.map.popup(parcel);
-            this.map.selectSingleGeom(parcel.getGeom());
+            this.popup = this._map.popup(parcel);
+            this._map.selectSingleGeom(parcel.getGeom());
         }
 
             
