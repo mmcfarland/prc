@@ -15,3 +15,10 @@ create table if not exists collection_parcels (
 	parcelid	integer NOT NULL
 );
 create index collection_parcels_idx on collection_parcels (collectionid);
+
+create table if not exists users (
+	username	varchar(255),
+	email		varchar(255),
+	password	varchar(255),
+	joined		timestamp DEFAULT current_timestamp
+);
