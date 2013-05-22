@@ -115,9 +115,3 @@ type Collection struct {
 	Created  *time.Time `json:"created"`
 	Modified *time.Time `json:"modified"`
 }
-
-type User struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	email string `json:"email"`
-}

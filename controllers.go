@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -59,6 +60,17 @@ func ParcelLocationHandler(w http.ResponseWriter, r *http.Request) {
 		ResponseWithError(0, err, w, "Parcel")
 	} else {
 		b, _ := json.Marshal([]Parcel{*p})
+		w.Write(b)
+	}
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	u, p := r.FormValue("username"), r.FormValue("password")
+	user, err := Login(u, p)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%s", err), 401)
+	} else {
+		b, _ := json.Marshal(user)
 		w.Write(b)
 	}
 }
