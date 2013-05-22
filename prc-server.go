@@ -48,6 +48,7 @@ func setupHandlers() {
 	api.HandleFunc("/collections/{cid:[0-9]+}", CollectionDetailsHandler)
 	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
 	api.HandleFunc("/login/", LoginHandler).Methods("POST")
+	api.HandleFunc("/register/", RegistrationHandler).Methods("POST")
 
 	r.HandleFunc("/", indexHandler)
 	http.Handle("/client/", http.StripPrefix("/client/", http.FileServer(http.Dir("client"))))

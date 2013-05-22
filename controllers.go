@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"log"
 	"net/http"
 	"strconv"
 )
+
+var decoder = schema.NewDecoder()
 
 func ResponseWithError(id int, err error, w http.ResponseWriter, name string) {
 	if err == sql.ErrNoRows {
@@ -73,4 +76,24 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		b, _ := json.Marshal(user)
 		w.Write(b)
 	}
+}
+
+func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
+	user := new(User)
+	r.ParseForm()
+	log.Println(r.PostForm)
+	if err := decoder.Decode(user, r.PostForm); err != nil {
+		log.Println(err)
+		http.Error(w, "Bad Form Values", 400)
+	}
+	log.Println(user)
+	log.Println("I am")
+	if err := user.Register(); err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("%s", err), 500)
+	} else {
+		b, _ := json.Marshal(user)
+		w.Write(b)
+	}
+	// Session start
 }

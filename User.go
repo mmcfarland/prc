@@ -57,3 +57,39 @@ func Login(un, p string) (u *User, err error) {
 		return
 	}
 }
+
+func (u *User) Register() (err error) {
+	exists := "SELECT username FROM users where username = $1;"
+	var un string
+	if s, e := DbConn.Prepare(exists); e != nil {
+		log.Println(e)
+		err = e
+	} else {
+		serr := s.QueryRow(u.Username).Scan(&un)
+		if serr == sql.ErrNoRows {
+			log.Println("here")
+			u.SetPassword(u.UnhashedPassword)
+			err = addUser(u)
+			// TODO: queue email
+		} else {
+			err = fmt.Errorf("Username %q already exists", u.Username)
+		}
+	}
+	return
+}
+
+func addUser(u *User) (err error) {
+	NoCreateError := fmt.Errorf("Could not create user: %q", u.Username)
+	insert := `INSERT INTO users (username, password, email)
+                VALUES ($1, $2, $3);`
+	if s, serr := DbConn.Prepare(insert); serr != nil {
+		log.Println(serr)
+		err = NoCreateError
+	} else {
+		if _, serr := s.Exec(u.Username, u.password, u.Email); serr != nil {
+			log.Println(serr)
+			err = NoCreateError
+		}
+	}
+	return
+}
