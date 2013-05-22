@@ -10,10 +10,11 @@ import (
 )
 
 type User struct {
-	Username string `json:"username"`
-	password []byte
-	Email    string     `json:"email"`
-	Joined   *time.Time `json:"joined"`
+	Username         string     `json:"username" schema:"username"`
+	password         []byte     `json:"-" schema:"-"`
+	UnhashedPassword string     `json:"-" schema:"pass"`
+	Email            string     `json:"email" schema:"email"`
+	Joined           *time.Time `json:"joined"`
 }
 
 func (u *User) SetPassword(pw string) {
