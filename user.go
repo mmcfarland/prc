@@ -30,6 +30,7 @@ func (u *User) CheckPassword(p string) (err error) {
 }
 
 func Login(un, p string) (u *User, err error) {
+	u = &User{}
 	loginError := errors.New("Login Failed: Unspecified Error")
 	userSql := `SELECT username, password, email, joined 
             FROM users
