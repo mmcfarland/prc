@@ -22,3 +22,4 @@ create table if not exists users (
 	password	varchar(255),
 	joined		timestamp DEFAULT current_timestamp
 );
+create index on users (username);
