@@ -23,6 +23,17 @@ const (
 	ConnString = "user=postgres dbname=dataviewer"
 )
 
+type CtxHandler func(http.ResponseWriter, *http.Request, *Context)
+
+func (h CtxHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx, err := NewContext(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	h(w, r, ctx)
+}
+
 func setupDb() (db *sql.DB) {
 	db, err := sql.Open("postgres", ConnString)
 	if err != nil {
@@ -35,20 +46,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	indexTmpl.Execute(w, r.Host)
 }
 
-func dbHandler(fn func(w http.ResponseWriter, r *http.Request, db *sql.DB), db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fn(w, r, db)
-	}
-}
-
 func setupHandlers() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/v0.1").Subrouter()
-	api.HandleFunc("/parcels/{id:[0-9]+}", ParcelDetailsHandler)
-	api.HandleFunc("/collections/{cid:[0-9]+}", CollectionDetailsHandler)
+	api.Handle("/parcels/{id:[0-9]+}", CtxHandler(ParcelDetailsHandler))
+	api.Handle("/collections/{cid:[0-9]+}", CtxHandler(CollectionHandler))
 	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
-	api.HandleFunc("/login/", LoginHandler).Methods("POST")
-	api.HandleFunc("/register/", RegistrationHandler).Methods("POST")
+	api.Handle("/login/", CtxHandler(LoginHandler)).Methods("POST")
+	api.Handle("/register/", CtxHandler(RegistrationHandler)).Methods("POST")
 
 	r.HandleFunc("/", indexHandler)
 	http.Handle("/client/", http.StripPrefix("/client/", http.FileServer(http.Dir("client"))))

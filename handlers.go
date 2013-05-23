@@ -11,7 +11,9 @@ import (
 	"strconv"
 )
 
-var decoder = schema.NewDecoder()
+var (
+	decoder = schema.NewDecoder()
+)
 
 func ResponseWithError(id int, err error, w http.ResponseWriter, name string) {
 	if err == sql.ErrNoRows {
@@ -23,7 +25,7 @@ func ResponseWithError(id int, err error, w http.ResponseWriter, name string) {
 	}
 }
 
-func ParcelDetailsHandler(w http.ResponseWriter, r *http.Request) {
+func ParcelDetailsHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 	log.Printf("Get parcel: %d", id)
@@ -35,7 +37,7 @@ func ParcelDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CollectionDetailsHandler(w http.ResponseWriter, r *http.Request) {
+func CollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	vars := mux.Vars(r)
 	cid, _ := strconv.Atoi(vars["cid"])
 	log.Printf("Get collection: %d", cid)
@@ -67,7 +69,7 @@ func ParcelLocationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func LoginHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	u, p := r.FormValue("username"), r.FormValue("password")
 	user, err := Login(u, p)
 	if err != nil {
@@ -78,16 +80,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
+func RegistrationHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	user := new(User)
 	r.ParseForm()
-	log.Println(r.PostForm)
 	if err := decoder.Decode(user, r.PostForm); err != nil {
 		log.Println(err)
 		http.Error(w, "Bad Form Values", 400)
 	}
-	log.Println(user)
-	log.Println("I am")
 	if err := user.Register(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("%s", err), 500)
