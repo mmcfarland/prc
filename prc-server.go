@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	port      = flag.Int("port", 7878, "Port")
-	DbConn    = setupDb()
-	indexTmpl = template.Must(template.ParseFiles("templates/index.html"))
+	port   = flag.Int("port", 7878, "Port")
+	DbConn = setupDb()
+	tmpl   = template.Must(template.ParseFiles("templates/index.html", "templates/bootstrap.js"))
 )
 
 const (
@@ -43,7 +43,17 @@ func setupDb() (db *sql.DB) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	indexTmpl.Execute(w, r.Host)
+	tmpl.ExecuteTemplate(w, "index.html", r.Host)
+}
+
+func bootstrapHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	log.Println("bst")
+	var u *User
+	if c.IsLoggedIn() {
+		u, _ = GetUser(c.GetUsername())
+	}
+	w.Header().Set("Content-Type", "text/javascript")
+	tmpl.ExecuteTemplate(w, "bootstrap.js", u)
 }
 
 func setupHandlers() {
@@ -54,8 +64,11 @@ func setupHandlers() {
 	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
 	api.Handle("/login/", CtxHandler(LoginHandler)).Methods("POST")
 	api.Handle("/register/", CtxHandler(RegistrationHandler)).Methods("POST")
+	api.Handle("/logout/", CtxHandler(LogoutHandler)).Methods("POST")
 
+	r.Handle("/bs.js", CtxHandler(bootstrapHandler))
 	r.HandleFunc("/", indexHandler)
+
 	http.Handle("/client/", http.StripPrefix("/client/", http.FileServer(http.Dir("client"))))
 	http.Handle("/", r)
 }
