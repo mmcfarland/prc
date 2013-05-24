@@ -38,6 +38,7 @@ func ParcelDetailsHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 }
 
 func CollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	log.Println(c.Session.Values["loggedin"])
 	vars := mux.Vars(r)
 	cid, _ := strconv.Atoi(vars["cid"])
 	log.Printf("Get collection: %d", cid)
@@ -74,10 +75,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	user, err := Login(u, p)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%s", err), 401)
-	} else {
-		b, _ := json.Marshal(user)
-		w.Write(b)
 	}
+	finishLogin(r, w, c, user)
 }
 
 func RegistrationHandler(w http.ResponseWriter, r *http.Request, c *Context) {
@@ -90,9 +89,16 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	if err := user.Register(); err != nil {
 		log.Println(err)
 		http.Error(w, fmt.Sprintf("%s", err), 500)
-	} else {
-		b, _ := json.Marshal(user)
-		w.Write(b)
 	}
-	// Session start
+	finishLogin(r, w, c, user)
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	c.Logout(r, w)
+}
+
+func finishLogin(r *http.Request, w http.ResponseWriter, c *Context, u *User) {
+	b, _ := json.Marshal(u)
+	c.Login(u, r, w)
+	w.Write(b)
 }
