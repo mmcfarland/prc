@@ -34,11 +34,15 @@ func (c *Context) Logout(r *http.Request, w http.ResponseWriter) {
 }
 
 func (c *Context) IsLoggedIn() bool {
-	return c.Session.Values["loggedin"] == true
+	v, ok := c.Session.Values["loggedin"]
+	if ok {
+		return v.(bool)
+	}
+	return false
 }
 
 func (c *Context) GetUsername() string {
-	if str, ok := c.Session.Values["use"].(string); ok {
+	if str, ok := c.Session.Values["user"].(string); ok {
 		return str
 	} else {
 		return ""

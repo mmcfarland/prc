@@ -9,7 +9,10 @@
 
     N.views.Login = Backbone.View.extend({
         initialize: function() {
-            this.model.on('change:loggedIn', this.render);
+            var view = this;
+            this.model.on('change:loggedIn', function() {
+                view.render();
+            });
             this.setElement(this.options.el);
             this.render();
         },
@@ -30,13 +33,16 @@
 
     N.views.LoginForm = Backbone.View.extend({
         initialize: function() {
-            this.model.on('change:loggedIn', this.render);
+            var view = this;
+            this.model.on('change:loggedIn', function() {
+                view.render();
+            });
             this.setElement(this.options.el);
             this.render();
         }, 
 
         events: {
-            'click button.login': 'login'
+            'click a.login': 'login'
         },
 
         render: function() {
@@ -50,7 +56,7 @@
             return this;
         },
 
-        login: function() {
+        login: function(e) {
             var view = this;
             var l = $.post('/api/v0.1/login/', {
                     username: this.$('input.username').val(),
@@ -58,13 +64,15 @@
                 },
                 function(user) {
                     view.model.set(_.extend({loggedIn: true}, user));
-                }
+                }, "json"
             );
 
            l.fail(function(e) {
               alert('failed');
+              console.log(e);
            }); 
 
+           e.preventDefault();
         }
     });
 

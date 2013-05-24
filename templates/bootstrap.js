@@ -1,5 +1,6 @@
 (function (N) {
     N.bootstrap = {
-        user: null 
+        user: {{.User}},
+        collections: {{.Collections}}
     };
 }(Prc));

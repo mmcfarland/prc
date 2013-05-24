@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"flag"
 	"fmt"
 	_ "github.com/bmizerany/pq"
@@ -47,13 +48,37 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func bootstrapHandler(w http.ResponseWriter, r *http.Request, c *Context) {
-	log.Println("bst")
-	var u *User
+	type bs struct {
+		User        string
+		Collections string
+	}
+
+	var u User
+	var cs []Collection
+
 	if c.IsLoggedIn() {
-		u, _ = GetUser(c.GetUsername())
+		// Check errors, this is going to bite someday
+		up, _ := GetUser(c.GetUsername())
+		u = *up
+		cs, _ = CollectionListByUser(u.Username)
+	} else {
+		u = User{}
+	}
+	uj, err := json.Marshal(u)
+	if err != nil {
+		log.Println(err)
+	}
+	cj, err := json.Marshal(cs)
+	if err != nil {
+		log.Println(err)
+	}
+
+	var bsc = bs{
+		User:        string(uj),
+		Collections: string(cj),
 	}
 	w.Header().Set("Content-Type", "text/javascript")
-	tmpl.ExecuteTemplate(w, "bootstrap.js", u)
+	tmpl.ExecuteTemplate(w, "bootstrap.js", bsc)
 }
 
 func setupHandlers() {

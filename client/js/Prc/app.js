@@ -7,6 +7,8 @@
         data: {},
 
         init: function () {
+            // Foundation must be initialized for all that ui to work
+            $(document).foundation();
             new N.TemplateLoader().load(N.app.tmpl);
             N.app.models.search = new N.models.Search();
             N.app.views.search = new N.views.Search({
@@ -24,7 +26,8 @@
         }, 
         
         setupUser: function() {
-            N.app.models.user = new N.models.User(N.bootstrap.user);
+            var u = N.bootstrap.user && N.bootstrap.user.username ? _.extend(N.bootstrap.user, {loggedIn: true}) : {loggedIn: false};
+            N.app.models.user = new N.models.User(u);
             N.app.views.login = new N.views.Login({
                 model: N.app.models.user,
                 el: $('#login-container')[0],
