@@ -30,33 +30,12 @@ func (u *User) CheckPassword(p string) (err error) {
 }
 
 func Login(un, p string) (u *User, err error) {
-	u = &User{}
-	loginError := errors.New("Login Failed: Unspecified Error")
-	userSql := `SELECT username, password, email, joined 
-            FROM users
-            WHERE username = $1;`
-	if s, e := DbConn.Prepare(userSql); e != nil {
+	u, err = GetUser(un)
+	if err = u.CheckPassword(p); err != nil {
 		u = nil
-		log.Println(e)
-		err = loginError
-		return
-	} else {
-		if e = s.QueryRow(un).Scan(&u.Username, &u.password, &u.Email, &u.Joined); e != nil {
-			if e == sql.ErrNoRows {
-				u = nil
-				err = fmt.Errorf("Login Failed: User %q not found", un)
-			} else {
-				log.Println(e)
-				err = loginError
-			}
-			return
-		}
-		if err = u.CheckPassword(p); err != nil {
-			u = nil
-			err = errors.New("Login Failed: Bad Password")
-		}
-		return
+		err = errors.New("Login Failed: Bad Password")
 	}
+	return
 }
 
 func (u *User) Register() (err error) {
@@ -93,4 +72,30 @@ func addUser(u *User) (err error) {
 		}
 	}
 	return
+}
+
+func GetUser(un string) (u *User, err error) {
+	loginError := errors.New("Login Failed: Unspecified Error")
+	u = new(User)
+	userSql := `SELECT username, password, email, joined 
+            FROM users
+            WHERE username = $1;`
+	if s, e := DbConn.Prepare(userSql); e != nil {
+		u = nil
+		log.Println(e)
+		err = loginError
+		return
+	} else {
+		if e = s.QueryRow(un).Scan(&u.Username, &u.password, &u.Email, &u.Joined); e != nil {
+			if e == sql.ErrNoRows {
+				u = nil
+				err = fmt.Errorf("Login Failed: User %q not found", un)
+			} else {
+				log.Println(e)
+				err = loginError
+			}
+			return
+		}
+		return
+	}
 }
