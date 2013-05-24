@@ -13,13 +13,16 @@
     </head>
     <body>
         <header class="main">
+            <div id="login-container">
+            </div>
             <div class="logo">prc</div>
             <div id="search-container" class="search-bar">
                 <input id="search" type="search" autofocus/>
             </div>
         </header>
         <div id="map"> </div>
-        
+        <div id="login-dropdown" class="f-dropdown content" data-dropdown-content></div>
+
         <script type="text/template" id="template-parcel-detail">
             <h4><%=parcel.Address%></h4>
             <h5><% print(parcel.Owner1 + " " + parcel.Owner2);%></h5>
@@ -35,6 +38,30 @@
                 </li>
         </script>
 
+        <script type="text/template" id="template-login-form">
+            <form>
+                <div class="row">
+                    <div class="large-12 columns">
+                        <input type="text" placeholder="Username"> 
+                    </div>
+                    <div class="large-12 columns">
+                        <input type="password" placeholder="Password">
+                    </div>
+                    <div class="large-12 columns">
+                        <button class="button login">Login</button>
+                    </div>
+                </div>
+            </form>
+        </script>
+
+        <script type="text/template" id="template-logout-form">
+            <button class="button logout">Logout</button>
+        </script>
+
+        <script type="text/template" id="template-login">
+            <a href="#" data-dropdown="login-dropdown" class="button small split"><%=action%><span></span></a>
+        </script>
+
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/4.1.2/js/foundation.min.js"></script>
         <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script> 
@@ -44,8 +71,10 @@
 
         <script src="/client/js/jquery.philaddress.js"></script>
         <script src="/client/js/prc.js"></script>
+        <script src="/bs.js"></script>
         <script src="/client/js/TemplateLoader.js"></script>
         <script src="/client/js/Prc/app.js"></script>
+        <script src="/client/js/Prc/user.js"></script>
         <script src="/client/js/Prc/parcel.js"></script>
         <script src="/client/js/Prc/search.js"></script>
         <script src="/client/js/Prc/map.js"></script>
