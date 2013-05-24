@@ -84,6 +84,25 @@ func ParcelByLocation(lat, lon float64) (*Parcel, error) {
 	}
 }
 
+func ScanCollectionRows(rs sql.Rows) ([]Collection, error) {
+	var cs []Collection
+	for rs.Next() {
+		c, err := ScanCollectionRow(&rs)
+		if err != nil {
+			return nil, err
+		} else {
+			cs = append(cs, *c)
+		}
+	}
+	return cs, nil
+}
+
+func ScanCollectionRow(s Scanner) (*Collection, error) {
+	var c Collection
+	err := s.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created, &c.Modified)
+	return &c, err
+}
+
 func CollectionById(id int) (*Collection, error) {
 	sql := `SELECT id, title, description, owner, public, created, modified 
             FROM Collections 
@@ -91,16 +110,29 @@ func CollectionById(id int) (*Collection, error) {
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return nil, err
 	} else {
-		r := s.QueryRow(id)
-		var c Collection
-		if err := r.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created,
-			&c.Modified); err != nil {
+		c, err := ScanCollectionRow(s.QueryRow(id))
+		if err != nil {
 			return nil, err
 		}
 		if c.Parcels, err = ParcelsByCid(id); err != nil {
-			return &c, err
+			return c, err
 		} else {
-			return &c, nil
+			return c, nil
+		}
+	}
+}
+
+func CollectionListByUser(username string) ([]Collection, error) {
+	sql := `SELECT id, title, desc, owner
+                FROM collections
+                WHERE owner = $1;`
+	if s, err := DbConn.Prepare(sql); err != nil {
+		return nil, err
+	} else {
+		if rs, err := s.Query(username); err != nil {
+			return nil, err
+		} else {
+			return ScanCollectionRows(*rs)
 		}
 	}
 }
