@@ -42,7 +42,8 @@
         }, 
 
         events: {
-            'click a.login': 'login'
+            'click a.login': 'login',
+            'click button.logout': 'logout'
         },
 
         render: function() {
@@ -73,6 +74,15 @@
            }); 
 
            e.preventDefault();
+        },
+
+        logout: function(e) {
+            var view = this,
+                l = $.post('/api/v0.1/logout/')
+                    .fail(function(e) { alert('failed')})
+                    .done(function() {
+                        view.model.set('loggedIn', false);
+                    });
         }
     });
 
