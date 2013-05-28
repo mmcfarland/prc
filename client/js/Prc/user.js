@@ -43,7 +43,8 @@
 
         events: {
             'click a.login': 'login',
-            'click button.logout': 'logout'
+            'click button.logout': 'logout',
+            'click input': 'noClose'
         },
 
         render: function() {
@@ -56,6 +57,8 @@
             this.$el.empty().append(form);
             return this;
         },
+
+        noClose: function(e) { e.stopPropagation()},
 
         login: function(e) {
             var view = this;
