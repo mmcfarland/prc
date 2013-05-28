@@ -16,7 +16,7 @@
                 if (store[id]) {
                     throw ("Duplicate template name: " + id);
                 } else {
-                    store[id] = _.template(html);
+                    store[id] = _.template($.trim(html));
                 }
             });
         };

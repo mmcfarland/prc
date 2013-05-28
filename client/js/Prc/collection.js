@@ -15,16 +15,17 @@
 
     N.views.CollectionList = Backbone.View.extend({
         initialize: function() {
-           var list = N.app.tmpl['template-my-collections'](); 
-           this.setElement($(list[0]));
+           var list = N.app.tmpl['template-my-collections']();
+           this.setElement($(list)[0]);
         },
 
         render: function() {
-            this.items = [];
-            this.collection.each(function(c) {
+            var view = this;
+            view.items = [];
+            view.collection.each(function(c) {
                 var item = new N.views.CollectionItem({model: c});
-                this.items.push(item);
-                this.$el.append(item.$el);
+                view.items.push(item);
+                view.$el.append(item.$el);
             });
             return this;
         }

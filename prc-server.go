@@ -55,12 +55,13 @@ func bootstrapHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 
 	var u User
 	var cs []Collection
-
+	var err error
 	if c.IsLoggedIn() {
 		// Check errors, this is going to bite someday
 		up, _ := GetUser(c.GetUsername())
 		u = *up
-		cs, _ = CollectionListByUser(u.Username)
+		cs, err = CollectionListByUser(u.Username)
+		log.Println(err)
 	} else {
 		u = User{}
 	}
@@ -68,6 +69,8 @@ func bootstrapHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	if err != nil {
 		log.Println(err)
 	}
+	log.Println("cs:")
+	log.Println(cs)
 	cj, err := json.Marshal(cs)
 	if err != nil {
 		log.Println(err)

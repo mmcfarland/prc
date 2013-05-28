@@ -58,7 +58,7 @@
             N.app.collections.myCollections = new N.collections.Collections();
             N.app.collections.localCollection = new N.collections.LocalCollection();
 
-            N.app.collections.myCollections.reset(N.bootstrap.Collections);
+            N.app.collections.myCollections.reset(N.bootstrap.collections);
             N.app.collections.localCollection.fetch();
 
             N.views.myCollectionList = new N.views.CollectionList({

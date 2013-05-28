@@ -123,7 +123,7 @@ func CollectionById(id int) (*Collection, error) {
 }
 
 func CollectionListByUser(username string) ([]Collection, error) {
-	sql := `SELECT id, title, desc, owner
+	sql := `SELECT id, title, description, owner, public, created, modified
                 FROM collections
                 WHERE owner = $1;`
 	if s, err := DbConn.Prepare(sql); err != nil {
