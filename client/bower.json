@@ -5,8 +5,8 @@
     "jquery": "~2.0.0",
     "backbone": "~1.0.0",
     "leaflet": "~0.5.1",
-    "foundation": "~4.1.6"
-    "leaflet-providers": "#dc7f22b1ac2850b04ea5bde5474986cf6e3ed7be"
+    "foundation": "~4.1.6",
+    "backbone.localStorage": "~1.1.4"
   },
   "ignore": [
     "**/.*",
