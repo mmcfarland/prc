@@ -22,6 +22,7 @@
         </header>
         <div id="map"> </div>
         <ul id="login-dropdown" class="f-dropdown content" data-dropdown-content></ul>
+        <div id="collection-town"></div>
 
         <script type="text/template" id="template-parcel-detail">
             <h4><%=parcel.Address%></h4>
@@ -60,12 +61,24 @@
             <a data-dropdown="login-dropdown" class="button split small"><span></span><%=action%></a>
         </script>
 
+        <script type="text/template" id="template-my-collections">
+            <ul id="my-collection" class="collections"></ul>
+        </script>
+
+        <script type="text/template" id="template-collection">
+            <li class="collection">
+            <h5><%=title%></h5>
+            </li>
+        </script>
+
+
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="/client/js/foundation.min.js"></script>
         <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script> 
         <script src="/client/components/leaflet-providers/leaflet-providers.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script> 
         <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.10/backbone-min.js"></script>
+        <script src="/client/components/backbone.localStorage/backbone.localStorage.js"></script>
 
         <script src="/client/js/jquery.philaddress.js"></script>
         <script src="/client/js/prc.js"></script>
@@ -74,6 +87,7 @@
         <script src="/client/js/Prc/app.js"></script>
         <script src="/client/js/Prc/user.js"></script>
         <script src="/client/js/Prc/parcel.js"></script>
+        <script src="/client/js/Prc/collection.js"></script>
         <script src="/client/js/Prc/search.js"></script>
         <script src="/client/js/Prc/map.js"></script>
         <script type="text/javascript">

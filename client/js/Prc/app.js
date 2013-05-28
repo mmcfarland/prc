@@ -23,6 +23,7 @@
             });
 
             this.setupUser();
+            this.setupParcelCollections();
         }, 
         
         setupUser: function() {
@@ -45,6 +46,26 @@
                 el: $('#login-dropdown')[0]
             });
 
+        },
+
+        setupParcelCollections: function() {
+            // Parcel collections come in several varieties:
+            //  * My Collections - remotely stored specific to user
+            //  * Public/Gallery - remotely stored global
+            //  * My Computer    - locally stored specific
+            var $container = $("#collection-town");
+
+            N.app.collections.myCollections = new N.collections.Collections();
+            N.app.collections.localCollection = new N.collections.LocalCollection();
+
+            N.app.collections.myCollections.reset(N.bootstrap.Collections);
+            N.app.collections.localCollection.fetch();
+
+            N.views.myCollectionList = new N.views.CollectionList({
+                collection: N.app.collections.myCollections
+            });
+
+            N.views.myCollectionList.render().$el.appendTo($container);
         }
     };
 }(Prc));
