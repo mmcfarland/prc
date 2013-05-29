@@ -4,6 +4,17 @@
             username: null,
             email: null,
             joined: null
+        }, 
+
+        initialize: function() {
+            var self = this;
+            self.on('change:loggedIn', function() {
+                if (self.get('loggedIn')) {
+                    self.get('collections').fetch({reset: true});
+                } else {
+                    self.get('collections').reset();
+                }
+            });
         }
     });
 

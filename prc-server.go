@@ -89,6 +89,7 @@ func setupHandlers() {
 	api := r.PathPrefix("/api/v0.1").Subrouter()
 	api.Handle("/parcels/{id:[0-9]+}", CtxHandler(ParcelDetailsHandler))
 	api.Handle("/collections/{cid:[0-9]+}", CtxHandler(CollectionHandler))
+	api.Handle("/collections/", CtxHandler(UserCollectionHandler))
 	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
 	api.Handle("/login/", CtxHandler(LoginHandler)).Methods("POST")
 	api.Handle("/register/", CtxHandler(RegistrationHandler)).Methods("POST")

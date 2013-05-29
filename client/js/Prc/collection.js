@@ -15,12 +15,17 @@
 
     N.views.CollectionList = Backbone.View.extend({
         initialize: function() {
-           var list = N.app.tmpl['template-my-collections']();
-           this.setElement($(list)[0]);
+           var view = this,m
+               list = N.app.tmpl['template-my-collections']();
+           view.setElement($(list)[0]);
+           view.collection.on('reset', function() {
+               view.render();
+           });
         },
 
         render: function() {
             var view = this;
+            _.invoke(view.items, "remove");
             view.items = [];
             view.collection.each(function(c) {
                 var item = new N.views.CollectionItem({model: c});

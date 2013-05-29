@@ -22,13 +22,19 @@
                 search: N.app.models.search
             });
 
-            this.setupUser();
             this.setupParcelCollections();
+            this.setupUser();
         }, 
         
         setupUser: function() {
-            var u = N.bootstrap.user && N.bootstrap.user.username ? _.extend(N.bootstrap.user, {loggedIn: true}) : {loggedIn: false};
-            N.app.models.user = new N.models.User(u);
+            var u = N.bootstrap.user && N.bootstrap.user.username 
+                    ? _.extend(N.bootstrap.user, {loggedIn: true}) 
+                    : {loggedIn: false},
+                attrs = _.extend({
+                    collections: N.app.collections.myCollections
+                }, u);
+
+            N.app.models.user = new N.models.User(attrs);
             N.app.views.login = new N.views.Login({
                 model: N.app.models.user,
                 el: $('#login-container')[0],

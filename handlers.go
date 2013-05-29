@@ -49,6 +49,20 @@ func CollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 		w.Write(b)
 	}
 }
+
+func UserCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	if c.IsLoggedIn() {
+		if cs, err := CollectionListByUser(c.GetUsername()); err != nil {
+			ResponseWithError(0, err, w, "Collections")
+		} else {
+			b, _ := json.Marshal(cs)
+			w.Write(b)
+		}
+	} else {
+		http.Error(w, "", 404)
+	}
+}
+
 func ParcelLocationHandler(w http.ResponseWriter, r *http.Request) {
 	lat, err := strconv.ParseFloat(r.FormValue("lat"), 32)
 	if err != nil {
