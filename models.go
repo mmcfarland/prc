@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/bmizerany/pq"
 	"time"
@@ -133,6 +134,25 @@ func CollectionListByUser(username string) ([]Collection, error) {
 			return nil, err
 		} else {
 			return ScanCollectionRows(*rs)
+		}
+	}
+}
+
+func AddParcelToCollection(username string, cid, pid int) (*Collection, error) {
+	if c, err := CollectionById(cid); err != nil {
+		return nil, err
+	} else if c.Owner != username { // TODO: admin role
+		return nil, errors.New("Not authorized to change collection")
+	} else {
+		sql := `INSERT INTO collection_parcels ($1, $2);`
+		if s, err := DbConn.Prepare(sql); err != nil {
+			return nil, err
+		} else {
+			if _, err := s.Exec(cid, pid); err != nil {
+				return nil, err
+			} else {
+				return c, nil
+			}
 		}
 	}
 }

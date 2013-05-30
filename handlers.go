@@ -38,7 +38,6 @@ func ParcelDetailsHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 }
 
 func CollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
-	log.Println(c.Session.Values["loggedin"])
 	vars := mux.Vars(r)
 	cid, _ := strconv.Atoi(vars["cid"])
 	log.Printf("Get collection: %d", cid)
@@ -60,6 +59,22 @@ func UserCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 		}
 	} else {
 		http.Error(w, "", 404)
+	}
+}
+
+func AddParcelToCollecditonHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	if c.IsLoggedIn() {
+		vars := mux.Vars(r)
+		cid, _ := strconv.Atoi(vars["cid"])
+		pid, _ := strconv.Atoi(vars["pid"])
+		if c, err := AddParcelToCollection(c.GetUsername(), cid, pid); err != nil {
+			http.Error(w, "", 401)
+		} else {
+			b, _ := json.Marshal(c)
+			w.Write(b)
+		}
+	} else {
+		http.Error(w, "Must be looged in", 401)
 	}
 }
 
