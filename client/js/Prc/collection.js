@@ -47,4 +47,51 @@
             this.setElement($item[0]);
         }
     });
+
+    N.views.CollectionSelect = Backbone.View.extend({
+        initialize: function() {
+            var view = this;
+            view.tmpl = N.app.tmpl['template-save-to-collection'];
+            view.render();
+            view.collection.on('reset', function() {
+                view.render();
+            });
+        }, 
+
+        events: {
+            'select change': 'collectionSelected'
+        },
+
+        render: function() {
+            var view = this,
+                $select;
+            view.$el.empty().append(view.tmpl());
+            _.invoke(view.items, "remove");
+            view.items = [];
+            $select = view.$('select');
+            view.collection.each(function(c) {
+                var item = new N.views.CollectionSelect({model: c});
+                view.items.push(item);
+                $select.append(item.$el);
+            });
+            return this;
+        }, 
+
+        collectionSelected: function(e) {
+            console.log(this);
+        }
+    });
+
+    N.views.CollectionOption = Backbone.View.extend({
+        initialize: function() {
+            this.tmpl = N.app.tmpl['template-collection-option'];
+            this.render();
+        },
+
+        render: function() {
+            var $item = $(this.tmpl(this.model.toJSON()));
+            this.setElement($item[0]);
+        }
+    });
+
 }(Prc));
