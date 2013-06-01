@@ -28,6 +28,7 @@
     N.Map.prototype.popup = function(parcel) {
         var context = {parcel: parcel.toJSON()},
             content = N.app.tmpl["template-parcel-detail"](context);
+
         return L.popup().setLatLng(parcel.getCoordinates())
                 .setContent(content)
                 .openOn(this.map);
@@ -86,5 +87,18 @@
             
     });
 
+    N.views.Popup = Backbone.View.extend({
+        initialize: function() {
+            var view = this;
+            view.tmpl = N.app.tmpl['template-popup'];
+        }, 
+
+        render: function() {
+
+            var collection = new N.views.CollectionSelect({
+                collection: N.app.collections.myCollections
+            });
+        }
+    });
 
 }(Prc));
