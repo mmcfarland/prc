@@ -67,11 +67,12 @@
             N.app.collections.myCollections.reset(N.bootstrap.collections);
             N.app.collections.localCollection.fetch();
 
-            N.views.myCollectionList = new N.views.CollectionList({
+            N.app.views.myCollectionList = new N.views.CollectionList({
                 collection: N.app.collections.myCollections
             });
 
-            N.views.myCollectionList.render().$el.appendTo($container);
+            N.app.views.myCollectionList.render().$el.appendTo($container);
+
         }
     };
 }(Prc));
