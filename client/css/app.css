@@ -52,3 +52,7 @@ header.main {
 .leaflet-popup .leaflet-popup-content-wrapper {
     border-radius: 5px;
 }
+
+.leaflet-popup .leaflet-popup-content {
+    min-width: 250px;
+}

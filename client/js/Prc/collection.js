@@ -59,7 +59,7 @@
         }, 
 
         events: {
-            'select change': 'collectionSelected'
+            'change select': 'collectionSelected'
         },
 
         render: function() {
@@ -69,17 +69,24 @@
             _.invoke(view.items, "remove");
             view.items = [];
             $select = view.$('select');
+            $select.append(view._makeOption(new N.models.Collection(
+                {id: -1, title: 'Select collection'})));
             view.collection.each(function(c) {
-                var item = new N.views.CollectionSelect({model: c});
-                view.items.push(item);
-                $select.append(item.$el);
+                $select.append(view._makeOption(c));
             });
             return this;
         }, 
 
         collectionSelected: function(e) {
             console.log(this);
-        }
+        },
+
+        _makeOption: function(c) {
+            var item = new N.views.CollectionOption({model: c});
+            this.items.push(item);
+            return item.$el;
+        } 
+
     });
 
     N.views.CollectionOption = Backbone.View.extend({

@@ -26,12 +26,12 @@
         _.extend(self, Backbone.Events)
     };
     N.Map.prototype.popup = function(parcel) {
-        var context = {parcel: parcel.toJSON()},
-            content = N.app.tmpl["template-parcel-detail"](context);
-
-        return L.popup().setLatLng(parcel.getCoordinates())
-                .setContent(content)
+        var details = new N.views.MapPopup({
+                model: parcel
+            }),
+            popup = L.popup().setLatLng(parcel.getCoordinates())
                 .openOn(this.map);
+        $(popup._contentNode).append(details.render().$el);
     };
 
     N.Map.prototype.selectSingleGeom = function(geom) {
@@ -87,17 +87,20 @@
             
     });
 
-    N.views.Popup = Backbone.View.extend({
+    N.views.MapPopup = Backbone.View.extend({
         initialize: function() {
             var view = this;
-            view.tmpl = N.app.tmpl['template-popup'];
+            view.tmpl = N.app.tmpl['template-parcel-detail'];
         }, 
 
         render: function() {
-
+            var view = this;
+            view.$el.append(view.tmpl({parcel: view.model.toJSON()}));
             var collection = new N.views.CollectionSelect({
                 collection: N.app.collections.myCollections
             });
+            view.$el.append(collection.$el);
+            return view;
         }
     });
 
