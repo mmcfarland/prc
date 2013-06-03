@@ -1,7 +1,21 @@
 (function(N) {
     // Is this confusing enough?
     N.models.Collection = Backbone.Model.extend({
-        urlRoot: '/api/v0.1/collection/'
+        urlRoot: '/api/v0.1/collection/',
+
+        addParcel: function(parcel) {
+            var parcelList = this.get('parcels');
+            if (!_.contains(parcelList, parcel.id)) {
+                parcelList.push(parcel.id);
+
+                $.post({
+                    url: this.urlRoot + 'parcels',
+                    data: parcel.id
+                }).done(function() {
+
+                });
+            }
+        }
     });
 
     N.collections.Collections = Backbone.Collection.extend({
@@ -78,7 +92,11 @@
         }, 
 
         collectionSelected: function(e) {
-            console.log(this);
+            var cid = parseInt(e.currentTarget.value),
+                c = this.collection.findWhere({
+                   id: cid 
+                });
+            this.trigger('collectionChange', c);
         },
 
         _makeOption: function(c) {
