@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "jquery": "~2.0.0",
-    "backbone": "~1.0.0",
+    "backbone": "1.0.0",
     "leaflet": "~0.5.1",
     "foundation": "~4.1.6",
     "backbone.localStorage": "~1.1.4"
