@@ -66,7 +66,10 @@
         },
 
         makeParcelInfoRequest: function(latlon) {
-            this.model.get('selectedParcels').fetch({data: latlon});
+            this.model.get('selectedParcels').fetch({
+                data: latlon,
+                reset: true
+            });
         }, 
 
         showParcel: function(parcelInfo) {
@@ -96,11 +99,19 @@
         render: function() {
             var view = this;
             view.$el.append(view.tmpl({parcel: view.model.toJSON()}));
-            var collection = new N.views.CollectionSelect({
+            view.saveTo = new N.views.CollectionSelect({
                 collection: N.app.collections.myCollections
+            }).on('collectionChange', function(pc) {
+                pc.addParcel(view.model);
             });
-            view.$el.append(collection.$el);
+
+            view.$el.append(view.saveTo.$el);
             return view;
+        },
+
+        close: function() {
+            this.remove();
+            this.saveTo.off();
         }
     });
 

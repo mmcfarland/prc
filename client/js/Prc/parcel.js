@@ -1,6 +1,9 @@
 (function (N) {
     N.models.Parcel = Backbone.Model.extend({
         urlRoot: '/api/v0.1/parcels/',
+
+        idAttribute: 'id',
+
         getCoordinates: function() {
             if (!this._coords) {
                this._coords = $.parseJSON(this.get('Pos')).coordinates.reverse();
