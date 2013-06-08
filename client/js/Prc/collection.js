@@ -4,15 +4,18 @@
         urlRoot: '/api/v0.1/collections/',
 
         addParcel: function(parcel) {
-            var parcelList = this.get('parcelIds');
+            var model = this,
+                parcelList = _.clone(model.get('parcelIds'));
             if (!_.contains(parcelList, parcel.id)) {
-                parcelList.push(parcel.id);
 
                 $.ajax({
                     type: 'PUT',
-                    url: this.url() + '/parcels/' + parcel.id,
+                    url: model.url() + '/parcels/' + parcel.id,
                 }).done(function() {
                     console.log(arguments);
+                    
+                    parcelList.push(parcel.id);
+                    model.set('parcelIds', parcelList);
                 });
             }
         }
@@ -51,14 +54,21 @@
     });
 
     N.views.CollectionItem = Backbone.View.extend({
+        tagName: "li",
+        className: "collection",
+
         initialize: function() {
-            this.tmpl = N.app.tmpl['template-collection'];
-            this.render();
+            var view = this;
+            view.model.on('change:parcelIds', function() {
+                view.render();
+            });
+            view.tmpl = N.app.tmpl['template-collection'];
+            view.render();
         },
 
         render: function() {
             var $item = $(this.tmpl(this.model.toJSON()));
-            this.setElement($item[0]);
+            this.$el.empty().append($item);
         }
     });
 
