@@ -67,7 +67,9 @@ func AddParcelToCollecditonHandler(w http.ResponseWriter, r *http.Request, c *Co
 		vars := mux.Vars(r)
 		cid, _ := strconv.Atoi(vars["cid"])
 		pid, _ := strconv.Atoi(vars["pid"])
+		log.Printf("Adding P:%v to C:%v", pid, cid)
 		if c, err := AddParcelToCollection(c.GetUsername(), cid, pid); err != nil {
+			log.Println(err)
 			http.Error(w, "", 401)
 		} else {
 			b, _ := json.Marshal(c)

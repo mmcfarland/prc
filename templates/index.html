@@ -29,13 +29,13 @@
             <h5><% print(parcel.Owner1 + (parcel.Owner2 ? " & " + parcel.Owner2 : ""));%></h5>
             <ul class="pd-parcel">
                 <li><div class="cap">OPA Account</div>
-                    <div class="val"><%=parcel.OpaId%></div>            
+                    <div class="val"><%=parcel.opaId%></div>            
                 </li>
                 <li><div class="cap">Building Code</div>
-                    <div class="val"><%=parcel.BuildingCode%></div>            
+                    <div class="val"><%=parcel.buildingCode%></div>            
                 </li>
                 <li><div class="cap">Building Desc</div>
-                    <div class="val"><%=parcel.BuildingDesc%></div>            
+                    <div class="val"><%=parcel.buildingDesc%></div>            
                 </li>
         </script>
 
@@ -75,7 +75,8 @@
 
         <script type="text/template" id="template-collection">
             <li class="collection">
-            <h5><%=title%></h5>
+            <h5><%=title%><span> (<%=parcelIds.length%>)</span></h5>
+            <div><%=desc%></div>
             </li>
         </script>
 

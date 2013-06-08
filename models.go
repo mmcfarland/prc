@@ -5,20 +5,22 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/bmizerany/pq"
+	"strconv"
+	"strings"
 	"time"
 )
 
 type Parcel struct {
 	ParcelId int `json:"parcelId"`
 	// Pointers for sql.NullString handling in Scan, will marshall to null
-	Address      *string
-	Owner1       *string
-	Owner2       *string
-	BuildingCode *string
-	BuildingDesc *string
-	OpaId        *string
-	Geom         *string
-	Pos          *string
+	Address      *string `json:"address"`
+	Owner1       *string `json:"owner1"`
+	Owner2       *string `json:"owner2"`
+	BuildingCode *string `json:"buildingCode"`
+	BuildingDesc *string `json:"buildingDesc"`
+	OpaId        *string `json:"opaId"`
+	Geom         *string `json:"geom"`
+	Pos          *string `json:"pos"`
 }
 
 type Scanner interface {
@@ -189,12 +191,13 @@ func AddParcelToCollection(username string, cid, pid int) (*Collection, error) {
 }
 
 type Collection struct {
-	Id       int        `json:"id"`
-	Title    string     `json:"title"`
-	Desc     string     `json:"desc"`
-	Parcels  []Parcel   `json:"parcels"`
-	Owner    string     `json:"owner"`
-	Public   bool       `json:"public"`
-	Created  *time.Time `json:"created"`
-	Modified *time.Time `json:"modified"`
+	Id        int        `json:"id"`
+	Title     string     `json:"title"`
+	Desc      string     `json:"desc"`
+	Parcels   []Parcel   `json:"parcels,omitempty"`
+	ParcelIds []int      `json:"parcelIds,omitempty"`
+	Owner     string     `json:"owner"`
+	Public    bool       `json:"public"`
+	Created   *time.Time `json:"created"`
+	Modified  *time.Time `json:"modified"`
 }

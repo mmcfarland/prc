@@ -2,18 +2,18 @@
     N.models.Parcel = Backbone.Model.extend({
         urlRoot: '/api/v0.1/parcels/',
 
-        idAttribute: 'id',
+        idAttribute: 'parcelId',
 
         getCoordinates: function() {
             if (!this._coords) {
-               this._coords = $.parseJSON(this.get('Pos')).coordinates.reverse();
+               this._coords = $.parseJSON(this.get('pos')).coordinates.reverse();
             }
             return this._coords;
         },
 
         getGeom: function() {
             if (!this._geom) {
-                this._geom = $.parseJSON(this.get('Geom'));
+                this._geom = $.parseJSON(this.get('geom'));
             }
             return this._geom;
         }
