@@ -56,3 +56,14 @@ header.main {
 .leaflet-popup .leaflet-popup-content {
     min-width: 250px;
 }
+
+/* Chosen Overrides */
+/* Fix 100% width */
+.chzn-container, .chzn-drop, .chzn-drop .chzn-search, .chzn-drop .chzn-search input {
+    width: 100% !important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.chzn-container { width:250px !important; }
