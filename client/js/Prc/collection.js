@@ -8,11 +8,11 @@
             if (!_.contains(parcelList, parcel.id)) {
                 parcelList.push(parcel.id);
 
-                $.post({
-                    url: this.urlRoot + 'parcels',
-                    data: parcel.id
+                $.ajax({
+                    type: 'PUT',
+                    url: this.url() + '/parcels/' + parcel.id,
                 }).done(function() {
-
+                    console.log(arguments);
                 });
             }
         }
