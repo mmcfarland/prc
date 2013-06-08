@@ -9,7 +9,7 @@ import (
 )
 
 type Parcel struct {
-	ParcelId int
+	ParcelId int `json:"parcelId"`
 	// Pointers for sql.NullString handling in Scan, will marshall to null
 	Address      *string
 	Owner1       *string
@@ -85,10 +85,19 @@ func ParcelByLocation(lat, lon float64) (*Parcel, error) {
 	}
 }
 
-func ScanCollectionRows(rs sql.Rows) ([]Collection, error) {
-	var cs []Collection
+func ScanCollectionRows(rs sql.Rows, expectList bool) ([]Collection, error) {
+	var (
+		cs  []Collection
+		c   *Collection
+		err error
+	)
+
 	for rs.Next() {
-		c, err := ScanCollectionRow(&rs)
+		if expectList {
+			c, err = ScanCollectionListRow(&rs)
+		} else {
+			c, err = ScanCollectionRow(&rs)
+		}
 		if err != nil {
 			return nil, err
 		} else {
@@ -101,6 +110,25 @@ func ScanCollectionRows(rs sql.Rows) ([]Collection, error) {
 func ScanCollectionRow(s Scanner) (*Collection, error) {
 	var c Collection
 	err := s.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created, &c.Modified)
+	return &c, err
+}
+
+func ScanCollectionListRow(s Scanner) (*Collection, error) {
+	var c Collection
+	var pids string
+
+	err := s.Scan(&c.Id, &c.Title, &c.Desc, &c.Owner, &c.Public, &c.Created, &c.Modified, &pids)
+	sids := strings.Split(pids, ",")
+	ids := make([]int, 0, len(sids))
+	for _, sid := range sids {
+		id, err := strconv.Atoi(sid)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+
+	c.ParcelIds = ids
 	return &c, err
 }
 
@@ -124,16 +152,19 @@ func CollectionById(id int) (*Collection, error) {
 }
 
 func CollectionListByUser(username string) ([]Collection, error) {
-	sql := `SELECT id, title, description, owner, public, created, modified
-                FROM collections
-                WHERE owner = $1;`
+	sql := `SELECT id, title, description, owner, public, created, modified,
+                array_to_string(array_agg(parcelid), ',')
+            FROM collections c, collection_parcels cp 
+            WHERE c.id = cp.collectionid AND owner = $1 
+            GROUP BY id;`
+
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return nil, err
 	} else {
 		if rs, err := s.Query(username); err != nil {
 			return nil, err
 		} else {
-			return ScanCollectionRows(*rs)
+			return ScanCollectionRows(*rs, true)
 		}
 	}
 }
@@ -144,7 +175,7 @@ func AddParcelToCollection(username string, cid, pid int) (*Collection, error) {
 	} else if c.Owner != username { // TODO: admin role
 		return nil, errors.New("Not authorized to change collection")
 	} else {
-		sql := `INSERT INTO collection_parcels ($1, $2);`
+		sql := `INSERT INTO collection_parcels VALUES ($1, $2);`
 		if s, err := DbConn.Prepare(sql); err != nil {
 			return nil, err
 		} else {

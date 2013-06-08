@@ -4,7 +4,7 @@
         urlRoot: '/api/v0.1/collections/',
 
         addParcel: function(parcel) {
-            var parcelList = this.get('parcels');
+            var parcelList = this.get('parcelIds');
             if (!_.contains(parcelList, parcel.id)) {
                 parcelList.push(parcel.id);
 
