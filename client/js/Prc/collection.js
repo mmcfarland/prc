@@ -1,7 +1,7 @@
 (function(N) {
     // Is this confusing enough?
     N.models.Collection = Backbone.Model.extend({
-        urlRoot: '/api/v0.1/collection/',
+        urlRoot: '/api/v0.1/collections/',
 
         addParcel: function(parcel) {
             var parcelList = this.get('parcels');
