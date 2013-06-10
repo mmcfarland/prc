@@ -89,9 +89,16 @@ func setupHandlers() {
 	api := r.PathPrefix("/api/v0.1").Subrouter()
 	api.Handle("/parcels/{id:[0-9]+}", CtxHandler(ParcelDetailsHandler))
 	api.Handle("/collections/{cid:[0-9]+}", CtxHandler(CollectionHandler))
-	api.Handle("/collections/{cid:[0-9]+}/parcels/{pid:[0-9]+}",
+
+	collPar := "/collections/{cid:[0-9]+}/parcels/{pid:[0-9]+}"
+	api.Handle(collPar,
 		CtxHandler(AddParcelToCollecditonHandler)).Methods("PUT")
-	api.Handle("/collections/", CtxHandler(UserCollectionHandler))
+	api.Handle(collPar,
+		CtxHandler(RemoveParcelFromCollecditonHandler)).Methods("DELETE")
+
+	api.Handle("/collections/", CtxHandler(UserCollectionHandler)).Methods("GET")
+	api.Handle("/collections/", CtxHandler(NewCollectionHandler)).Methods("PUT")
+
 	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
 	api.Handle("/login/", CtxHandler(LoginHandler)).Methods("POST")
 	api.Handle("/register/", CtxHandler(RegistrationHandler)).Methods("POST")

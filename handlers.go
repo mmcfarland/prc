@@ -62,13 +62,50 @@ func UserCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	}
 }
 
+func NewCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	if c.IsLoggedIn() {
+		col := new(Collection)
+		r.ParseForm()
+		if err := decoder.Decode(col, r.PostForm); err != nil {
+			log.Println(err)
+			http.Error(w, "", 500)
+		}
+		col.Owner = c.GetUsername()
+		if id, err := AddCollection(col); err != nil {
+			log.Println(err)
+			http.Error(w, "Could not add parcel", 500)
+		} else {
+			col.Id = id
+			b, _ := json.Marshal(col)
+			w.Write(b)
+		}
+	} else {
+		http.Error(w, "Must be logged in to add collection", 401)
+	}
+}
+
+type ParcelCollectionAdjuster func(user string, cid, pid int) (*Collection, error)
+
+func RemoveParcelFromCollecditonHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	ParcelCollecditonModifier(w, r, c, false)
+}
+
 func AddParcelToCollecditonHandler(w http.ResponseWriter, r *http.Request, c *Context) {
+	ParcelCollecditonModifier(w, r, c, true)
+}
+
+func ParcelCollecditonModifier(w http.ResponseWriter, r *http.Request, c *Context, add bool) {
 	if c.IsLoggedIn() {
 		vars := mux.Vars(r)
 		cid, _ := strconv.Atoi(vars["cid"])
 		pid, _ := strconv.Atoi(vars["pid"])
-		log.Printf("Adding P:%v to C:%v", pid, cid)
-		if c, err := AddParcelToCollection(c.GetUsername(), cid, pid); err != nil {
+		var fn ParcelCollectionAdjuster
+		if add {
+			fn = AddParcelToCollection
+		} else {
+			fn = RemoveParcelFromCollection
+		}
+		if c, err := fn(c.GetUsername(), cid, pid); err != nil {
 			log.Println(err)
 			http.Error(w, "", 401)
 		} else {

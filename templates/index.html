@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="client/css/foundation.min.css"/>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css" />
         <link rel="stylesheet" href="client/css/app.css"/>
+        <link rel="stylesheet" href="client/js/chosen/chosen.css"/>
         <link rel="stylesheet" href="client/css/jquery.philaddress.css"/>
         <!--[if lte IE 8]>
            <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.ie.css" />
@@ -66,7 +67,7 @@
         </script>
 
         <script type="text/template" id="template-save-to-collection">
-            <select class="save-to-collection"></select>
+            <select class="save-to-collection" multiple></select>
         </script>
 
         <script type="text/template" id="template-collection-option">
@@ -80,7 +81,39 @@
             </div>
         </script>
 
+        <script type="text/template" id="template-new-collection">
+            <div id="add-collection-modal" class="reveal-modal medium">
+                <h2>Create a new collection</h2>
+                <form>
+                    <div class="row">
+                        <div class="large-9 columns">
+                            <label>Collection Title</label>
+                            <input type="text" name="title" placeholder="The name of your collection">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-9 columns">
+                            <label>Description</label>
+                            <input type="text" name="desc" placeholder="Collection Descriptions...">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-9 columns">
+                            <label>Add to Public Gallery?</label>
+                            <input type="checkbox" name="public">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-9 columns">
+                            <button class="button small" id="add-collection">Add</button>
+                            <button class="button small cancel">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </script>
 
+            
         <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="/client/js/foundation.min.js"></script>
         <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script> 
@@ -88,6 +121,7 @@
         <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script> 
         <script src="/client/components/backbone/backbone-min.js"></script>
         <script src="/client/components/backbone.localStorage/backbone.localStorage.js"></script>
+        <script src="/client/js/chosen/chosen.jquery.min.js"></script>
 
         <script src="/client/js/jquery.philaddress.js"></script>
         <script src="/client/js/prc.js"></script>

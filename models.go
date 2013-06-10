@@ -171,13 +171,22 @@ func CollectionListByUser(username string) ([]Collection, error) {
 	}
 }
 
+func RemoveParcelFromCollection(username string, cid, pid int) (*Collection, error) {
+	sql := `DELETE FROM collection_parcels WHERE collectionid = $1 and parcelid = $2;`
+	return ExecuteOnParcelCollection(sql, username, cid, pid)
+}
+
 func AddParcelToCollection(username string, cid, pid int) (*Collection, error) {
+	sql := `INSERT INTO collection_parcels VALUES ($1, $2);`
+	return ExecuteOnParcelCollection(sql, username, cid, pid)
+}
+
+func ExecuteOnParcelCollection(sql, username string, cid, pid int) (*Collection, error) {
 	if c, err := CollectionById(cid); err != nil {
 		return nil, err
 	} else if c.Owner != username { // TODO: admin role
 		return nil, errors.New("Not authorized to change collection")
 	} else {
-		sql := `INSERT INTO collection_parcels VALUES ($1, $2);`
 		if s, err := DbConn.Prepare(sql); err != nil {
 			return nil, err
 		} else {
@@ -190,14 +199,30 @@ func AddParcelToCollection(username string, cid, pid int) (*Collection, error) {
 	}
 }
 
+func AddCollection(c *Collection) (int, error) {
+	sql := `INSERT INTO collections (title, desc, owner, public)
+                VALUES ($1, $2, $3, $4);`
+	if s, err := DbConn.Prepare(sql); err != nil {
+		return -1, err
+	} else {
+		if r, err := s.Exec(c.Title, c.Desc, c.Owner, c.Public); err != nil {
+			return -1, err
+		} else {
+			// If parcel list, insert parcels ids
+			newid, _ := r.LastInsertId()
+			return int(newid), nil
+		}
+	}
+}
+
 type Collection struct {
-	Id        int        `json:"id"`
-	Title     string     `json:"title"`
-	Desc      string     `json:"desc"`
-	Parcels   []Parcel   `json:"parcels,omitempty"`
-	ParcelIds []int      `json:"parcelIds,omitempty"`
-	Owner     string     `json:"owner"`
-	Public    bool       `json:"public"`
+	Id        int        `json:"id" schema:"-"`
+	Title     string     `json:"title" schema:"title"`
+	Desc      string     `json:"desc" schema:"desc"`
+	Parcels   []Parcel   `json:"parcels,omitempty" schema:"-"`
+	ParcelIds []int      `json:"parcelIds,omitempty" schema:"parcelIds"`
+	Owner     string     `json:"owner" schema:"-"`
+	Public    bool       `json:"public" schema:"public"`
 	Created   *time.Time `json:"created"`
 	Modified  *time.Time `json:"modified"`
 }

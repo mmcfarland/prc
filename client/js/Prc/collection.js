@@ -94,19 +94,28 @@
             view.items = [];
             $select = view.$('select');
             $select.append(view._makeOption(new N.models.Collection(
-                {id: -1, title: 'Select collection'})));
+                {id: -1, title: 'New Collection...'})));
             view.collection.each(function(c) {
                 $select.append(view._makeOption(c));
             });
+            $select.chosen();
             return this;
         }, 
 
         collectionSelected: function(e) {
             var cid = parseInt(e.currentTarget.value),
+                c;
+            if (cid !== -1) {
                 c = this.collection.findWhere({
                    id: cid 
                 });
-            this.trigger('collectionChange', c);
+                this.trigger('collectionChange', c);
+            } else {
+                var n = new N.views.AddCollection({
+                    parcelList: [1001]
+                });
+            }
+                
         },
 
         _makeOption: function(c) {
@@ -127,6 +136,39 @@
             var $item = $(this.tmpl(this.model.toJSON()));
             this.setElement($item[0]);
         }
+    });
+
+    N.views.AddCollection = Backbone.View.extend({
+        initialize: function() {
+            this.tmpl = N.app.tmpl['template-new-collection'];
+            this.render();
+        }, 
+
+        events: {
+            'click #add-collection': 'addCollection', 
+            'click button.cancel': 'close'
+        },
+
+        render: function() {
+            this.setElement(this.tmpl());
+            this.$el.foundation('reveal', 'open');
+            return this;
+        }, 
+
+        addCollection: function() {
+            var newColl = this.$('form').serializeObject(); 
+            if (this.options.parcelList) {
+                newColl.parcelList = parcelList;
+            }
+            N.app.collections.myCollections.create(newColl);
+            this.close();    
+        }, 
+
+        close: function() {
+            this.$el.foundation('reveal', 'close');
+            this.remove();
+        }
+
     });
 
 }(Prc));
