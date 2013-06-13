@@ -113,7 +113,7 @@
             } else {
                 var n = new N.views.AddCollection({
                     parcelList: [1001]
-                });
+                }).show();
             }
                 
         },
@@ -146,23 +146,27 @@
 
         events: {
             'click #add-collection': 'addCollection', 
-            'click button.cancel': 'close'
+            'click a.cancel': 'close'
         },
 
         render: function() {
             this.setElement(this.tmpl());
-            this.$el.foundation('reveal', 'open');
+            $('body').append(this.$el);
             return this;
         }, 
 
         addCollection: function() {
             var newColl = this.$('form').serializeObject(); 
             if (this.options.parcelList) {
-                newColl.parcelList = parcelList;
+                newColl.parcelList = this.options.parcelList;
             }
             N.app.collections.myCollections.create(newColl);
             this.close();    
         }, 
+
+        show: function() {
+            this.$el.foundation('reveal', 'open');
+        },
 
         close: function() {
             this.$el.foundation('reveal', 'close');
