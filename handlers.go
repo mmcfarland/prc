@@ -65,11 +65,13 @@ func UserCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 func NewCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 	if c.IsLoggedIn() {
 		col := new(Collection)
-		r.ParseForm()
-		if err := decoder.Decode(col, r.PostForm); err != nil {
+		j, err := ioutil.ReadAll(r.Body)
+		if err != nil {
 			log.Println(err)
-			http.Error(w, "", 500)
 		}
+		err = json.Unmarshal(j, &col)
+		log.Println(col)
+		http.Error(w, "", 401)
 		col.Owner = c.GetUsername()
 		if id, err := AddCollection(col); err != nil {
 			log.Println(err)

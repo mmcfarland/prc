@@ -97,7 +97,7 @@ func setupHandlers() {
 		CtxHandler(RemoveParcelFromCollecditonHandler)).Methods("DELETE")
 
 	api.Handle("/collections/", CtxHandler(UserCollectionHandler)).Methods("GET")
-	api.Handle("/collections/", CtxHandler(NewCollectionHandler)).Methods("PUT")
+	api.Handle("/collections/", CtxHandler(NewCollectionHandler)).Methods("POST")
 
 	api.HandleFunc("/parcels/", ParcelLocationHandler).Queries("lat", "", "lon", "")
 	api.Handle("/login/", CtxHandler(LoginHandler)).Methods("POST")

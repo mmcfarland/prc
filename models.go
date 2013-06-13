@@ -200,7 +200,7 @@ func ExecuteOnParcelCollection(sql, username string, cid, pid int) (*Collection,
 }
 
 func AddCollection(c *Collection) (int, error) {
-	sql := `INSERT INTO collections (title, desc, owner, public)
+	sql := `INSERT INTO collections (title, description, owner, public)
                 VALUES ($1, $2, $3, $4);`
 	if s, err := DbConn.Prepare(sql); err != nil {
 		return -1, err
