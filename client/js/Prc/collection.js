@@ -3,20 +3,32 @@
     N.models.Collection = Backbone.Model.extend({
         urlRoot: '/api/v0.1/collections/',
 
-        addParcel: function(parcel) {
-            var model = this,
-                parcelList = _.clone(model.get('parcelIds'));
-            if (!_.contains(parcelList, parcel.id)) {
+        _addOrRemoveParcel: function(action, parcel, parcelList) {
+            var model = this;
+            $.ajax({
+                type: action,
+                url: model.url() + '/parcels/' + parcel.id,
+            }).done(function() {
+                console.log(arguments);
+                // Force the change event by adding a new array, not
+                // changing the existing
+                model.set('parcelIds', parcelList);
+            });
+        },
 
-                $.ajax({
-                    type: 'PUT',
-                    url: model.url() + '/parcels/' + parcel.id,
-                }).done(function() {
-                    console.log(arguments);
-                    
-                    parcelList.push(parcel.id);
-                    model.set('parcelIds', parcelList);
-                });
+        addParcel: function(parcel) {
+            var parcelList = _.clone(this.get('parcelIds'));
+            if (!_.contains(parcelList, parcel.id)) {
+                parcelList.push(parcel.id);
+                this._addOrRemoveParcel('PUT', parcel, parcelList);
+            }
+        },
+
+        removeParcel: function(parcel) {
+            var parcelList = _.clone(this.get('parcelIds'));
+            if (_.contains(parcelList, parcel.id)) {
+                parcelList.splice(parcelList.indexOf(parcel.id), 1);
+                this._addOrRemoveParcel('DELETE', parcel, parcelList);
             }
         }
     });
@@ -92,9 +104,11 @@
             view.$el.empty().append(view.tmpl());
             _.invoke(view.items, "remove");
             view.items = [];
+            
             $select = view.$('select');
             $select.append(view._makeOption(new N.models.Collection(
                 {id: -1, title: 'New Collection...'})));
+            
             view.collection.each(function(c) {
                 $select.append(view._makeOption(c));
             });
@@ -102,20 +116,22 @@
             return this;
         }, 
 
-        collectionSelected: function(e) {
-            var cid = parseInt(e.currentTarget.value),
-                c;
-            if (cid !== -1) {
-                c = this.collection.findWhere({
-                   id: cid 
-                });
-                this.trigger('collectionChange', c);
-            } else {
+        collectionSelected: function(e, item) {
+            if (item.selected === "-1") {
+                
                 var n = new N.views.AddCollection({
+                    // TODO: use real parcel id
                     parcelList: [1001]
                 }).show();
+                return;
             }
-                
+            
+            var c = this.collection.get(parseInt(item.selected || item.deselected));
+            if (item.selected) {
+                this.trigger('collectionAdd', c);
+            } else {
+                this.trigger('collectionRemove', c);
+            } 
         },
 
         _makeOption: function(c) {

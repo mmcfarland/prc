@@ -99,10 +99,13 @@
         render: function() {
             var view = this;
             view.$el.append(view.tmpl({parcel: view.model.toJSON()}));
+
             view.saveTo = new N.views.CollectionSelect({
                 collection: N.app.collections.myCollections
-            }).on('collectionChange', function(pc) {
+            }).on('collectionAdd', function(pc) {
                 pc.addParcel(view.model);
+            }).on('collectionRemove', function(pc) {
+                pc.removeParcel(view.model);
             });
 
             view.$el.append(view.saveTo.$el);
