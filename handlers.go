@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
