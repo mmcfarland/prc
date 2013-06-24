@@ -102,8 +102,6 @@
             var view = this,
                 $select;
             view.$el.empty().append(view.tmpl());
-            _.invoke(view.items, "remove");
-            view.items = [];
             
             $select = view.$('select');
             $select.append(view._makeOption(new N.models.Collection(
@@ -117,11 +115,11 @@
         }, 
 
         collectionSelected: function(e, item) {
+            // TODO: Make a 'new item' value
             if (item.selected === "-1") {
                 
                 var n = new N.views.AddCollection({
-                    // TODO: use real parcel id
-                    parcelList: [1001]
+                    parcelList: [this.options.parcelId]
                 }).show();
                 return;
             }
@@ -135,8 +133,9 @@
         },
 
         _makeOption: function(c) {
-            var item = new N.views.CollectionOption({model: c});
-            this.items.push(item);
+            var item = new N.views.CollectionOption({
+                model: c, parcelId: this.options.parcelId
+            });
             return item.$el;
         } 
 
@@ -149,7 +148,11 @@
         },
 
         render: function() {
-            var $item = $(this.tmpl(this.model.toJSON()));
+            var containsParcel = _.contains(this.model.get('parcelIds'), this.options.parcelId),
+                ctx = _.extend(this.model.toJSON(),{
+                    containsParcel: containsParcel
+                }),
+                $item = $(this.tmpl(ctx));
             this.setElement($item[0]);
         }
     });

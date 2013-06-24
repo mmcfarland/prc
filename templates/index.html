@@ -27,7 +27,7 @@
 
         <script type="text/template" id="template-parcel-detail">
             <h4><%=parcel.Address%></h4>
-            <h5><% print(parcel.Owner1 + (parcel.Owner2 ? " & " + parcel.Owner2 : ""));%></h5>
+            <h5><% print(parcel.owner1 + (parcel.owner2 ? " & " + parcel.owner2 : ""));%></h5>
             <ul class="pd-parcel">
                 <li><div class="cap">OPA Account</div>
                     <div class="val"><%=parcel.opaId%></div>            
@@ -71,7 +71,9 @@
         </script>
 
         <script type="text/template" id="template-collection-option">
-            <option value="<%=id%>"><%=title%></option>
+            <option value="<%=id%>" <%= containsParcel ? 'selected="selected"' : '' %>>
+                <%=title%>
+            </option>
         </script>
 
         <script type="text/template" id="template-collection">
