@@ -47,7 +47,7 @@
            var view = this,m
                list = N.app.tmpl['template-my-collections']();
            view.setElement($(list)[0]);
-           view.collection.on('reset', function() {
+           view.collection.on('reset add', function() {
                view.render();
            });
         },
@@ -89,7 +89,7 @@
             var view = this;
             view.tmpl = N.app.tmpl['template-save-to-collection'];
             view.render();
-            view.collection.on('reset', function() {
+            view.collection.on('reset sync', function() {
                 view.render();
             });
         }, 
@@ -106,6 +106,8 @@
             $select = view.$('select');
             $select.append(view._makeOption(new N.models.Collection(
                 {id: -1, title: 'New Collection...'})));
+            $select.append(view._makeOption(new N.models.Collection(
+                {id: -2, title: 'Local Scratchpad'})));
             
             view.collection.each(function(c) {
                 $select.append(view._makeOption(c));
@@ -122,6 +124,8 @@
                     parcelList: [this.options.parcelId]
                 }).show();
                 return;
+            } else if (item.selected === "-2" {
+                // Localstorage
             }
             
             var c = this.collection.get(parseInt(item.selected || item.deselected));
@@ -177,7 +181,7 @@
         addCollection: function() {
             var newColl = this.$('form').serializeObject(); 
             if (this.options.parcelList) {
-                newColl.parcelList = this.options.parcelList;
+                newColl.parcelIds = this.options.parcelList;
             }
             N.app.collections.myCollections.create(newColl);
             this.close();    
@@ -185,6 +189,7 @@
 
         show: function() {
             this.$el.foundation('reveal', 'open');
+            this.$('input:first').focus();
         },
 
         close: function() {

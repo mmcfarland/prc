@@ -173,24 +173,34 @@ func CollectionListByUser(username string) ([]Collection, error) {
 
 func RemoveParcelFromCollection(username string, cid, pid int) (*Collection, error) {
 	sql := `DELETE FROM collection_parcels WHERE collectionid = $1 and parcelid = $2;`
-	return ExecuteOnParcelCollection(sql, username, cid, pid)
-}
-
-func AddParcelToCollection(username string, cid, pid int) (*Collection, error) {
-	sql := `INSERT INTO collection_parcels VALUES ($1, $2);`
-	return ExecuteOnParcelCollection(sql, username, cid, pid)
-}
-
-func ExecuteOnParcelCollection(sql, username string, cid, pid int) (*Collection, error) {
-	if c, err := CollectionById(cid); err != nil {
+	c, err := CollectionById(cid)
+	if err != nil {
 		return nil, err
-	} else if c.Owner != username { // TODO: admin role
+	}
+	return ExecuteOnParcelCollection(sql, username, c, pid)
+}
+
+func AddParcelToCollectionById(username string, cid, pid int) (*Collection, error) {
+	c, err := CollectionById(cid)
+	if err != nil {
+		return nil, err
+	}
+	return AddParcelToCollection(username, c, pid)
+}
+
+func AddParcelToCollection(username string, c *Collection, pid int) (*Collection, error) {
+	sql := `INSERT INTO collection_parcels VALUES ($1, $2);`
+	return ExecuteOnParcelCollection(sql, username, c, pid)
+}
+
+func ExecuteOnParcelCollection(sql, username string, c *Collection, pid int) (*Collection, error) {
+	if c.Owner != username { // TODO: admin role
 		return nil, errors.New("Not authorized to change collection")
 	} else {
 		if s, err := DbConn.Prepare(sql); err != nil {
 			return nil, err
 		} else {
-			if _, err := s.Exec(cid, pid); err != nil {
+			if _, err := s.Exec(c.Id, pid); err != nil {
 				return nil, err
 			} else {
 				return c, nil
@@ -199,18 +209,22 @@ func ExecuteOnParcelCollection(sql, username string, cid, pid int) (*Collection,
 	}
 }
 
-func AddCollection(c *Collection) (int, error) {
+func AddCollection(c *Collection) error {
+	// The pq driver doesn't appear to support the LastInsertId command
+	// so fake it with the native postgres `returning` statement
 	sql := `INSERT INTO collections (title, description, owner, public)
-                VALUES ($1, $2, $3, $4);`
+                VALUES ($1, $2, $3, $4) returning id, created, modified;`
 	if s, err := DbConn.Prepare(sql); err != nil {
-		return -1, err
+		return err
 	} else {
-		if r, err := s.Exec(c.Title, c.Desc, c.Owner, c.Public); err != nil {
-			return -1, err
+		err := s.QueryRow(c.Title, c.Desc, c.Owner, c.Public).Scan(&c.Id, &c.Created, &c.Modified)
+		if err != nil {
+			return err
 		} else {
-			// If parcel list, insert parcels ids
-			newid, _ := r.LastInsertId()
-			return int(newid), nil
+			for _, parcelId := range c.ParcelIds {
+				AddParcelToCollection(c.Owner, c, parcelId)
+			}
+			return nil
 		}
 	}
 }

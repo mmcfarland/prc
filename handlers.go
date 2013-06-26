@@ -71,14 +71,15 @@ func NewCollectionHandler(w http.ResponseWriter, r *http.Request, c *Context) {
 			log.Println(err)
 		}
 		err = json.Unmarshal(j, &col)
-		log.Println(col)
-		http.Error(w, "", 401)
+		if err != nil {
+			http.Error(w, "Could not add parcel, bad input", 500)
+		}
+
 		col.Owner = c.GetUsername()
-		if id, err := AddCollection(col); err != nil {
+		if err := AddCollection(col); err != nil {
 			log.Println(err)
 			http.Error(w, "Could not add parcel", 500)
 		} else {
-			col.Id = id
 			b, _ := json.Marshal(col)
 			w.Write(b)
 		}
@@ -104,7 +105,7 @@ func ParcelCollecditonModifier(w http.ResponseWriter, r *http.Request, c *Contex
 		pid, _ := strconv.Atoi(vars["pid"])
 		var fn ParcelCollectionAdjuster
 		if add {
-			fn = AddParcelToCollection
+			fn = AddParcelToCollectionById
 		} else {
 			fn = RemoveParcelFromCollection
 		}
