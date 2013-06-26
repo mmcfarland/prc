@@ -57,6 +57,10 @@ header.main {
     min-width: 250px;
 }
 
+#map {
+    cursor: pointer;
+}
+
 /* Chosen Overrides */
 /* Fix 100% width */
 .chzn-container, .chzn-drop, .chzn-drop .chzn-search, .chzn-drop .chzn-search input {
